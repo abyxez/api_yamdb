@@ -23,6 +23,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'users'
+    'titles',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -41,7 +43,7 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATES_DIR],
+        'DIRS': [TEMPLATES_DIR,],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -108,7 +110,6 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
@@ -117,3 +118,4 @@ AUTH_USER_MODEL = 'users.User'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+
