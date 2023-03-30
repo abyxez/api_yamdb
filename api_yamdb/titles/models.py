@@ -1,6 +1,11 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
+
+
+User = get_user_model()
+
 
 ROLES = (
     'User',
@@ -9,14 +14,14 @@ ROLES = (
     'Superuser',
 )
 
-
+"""
 class User(AbstractUser):
     bio = models.TextField('Biography', )
     role = models.CharField('Role of the user',
                             max_length=13,
                             choices=ROLES,
                             default='User')
-
+"""
 
 class Category(models.Model):
     name = models.CharField('Category name',
@@ -48,7 +53,9 @@ class Title(models.Model):
     name = models.CharField(max_length=256,
                             verbose_name='Name', )
     year = models.DateField('Publication year', )
-    description = models.TextField('Description', )
+    description = models.TextField('Description',
+                                   null=True,
+                                   blank=True, )
 
     # author = models.ForeignKey(
     #     User, on_delete=models.CASCADE, related_name='reviews')
