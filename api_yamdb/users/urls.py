@@ -1,9 +1,7 @@
 from django.urls import path
 from .views import signup, get_jwt_token
-# from rest_framework_simplejwt.views import (
-#     TokenObtainPairView,
-#     TokenRefreshView,
-# )
+
+app_name = 'users'
 
 urlpatterns = [
     path('v1/auth/signup/', signup),
