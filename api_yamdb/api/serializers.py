@@ -28,16 +28,34 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+
+    # author = serializers.SlugRelatedField(
+    #     slug_field='username',
+    #     read_only=True,
+    #     default=serializers.CurrentUserDefault())
+
     class Meta:
-        fields = ('title_id',
-                  'text',
-                  'score', )
         model = Review
+        fields = ('id',
+                  'text',
+                  # 'author' пока без автора
+                  'score',
+                  'pub_date',)
+        read_only_fields = ('title',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
+
+    # author = serializers.SlugRelatedField(
+    #     slug_field='username',
+    #     read_only=True,
+    #     default=serializers.CurrentUserDefault())
+
     class Meta:
-        fields = ('title_id',
-                  'review_id',
-                  'text', )
         model = Comment
+        fields = ('id',
+                  'text',
+                  # 'author' пока без автора
+                  'pub_date',)
+        read_only_fields = ('title', 'review')
+
