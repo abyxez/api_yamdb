@@ -36,7 +36,6 @@ class Title(models.Model):
     description = models.TextField(verbose_name='Description',
                                    null=True,
                                    blank=True, )
-    rating = 
     
     class Meta:
         default_related_name = 'titles'
