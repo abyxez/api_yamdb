@@ -1,30 +1,10 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.contrib.auth.models import AbstractUser
+from users.models import User
 
-
-User = get_user_model()
-
-
-ROLES = (
-    'User',
-    'Moderator',
-    'Administrator',
-    'Superuser',
-)
-
-"""
-class User(AbstractUser):
-    bio = models.TextField('Biography', )
-    role = models.CharField('Role of the user',
-                            max_length=13,
-                            choices=ROLES,
-                            default='User')
-"""
 
 class Category(models.Model):
-    name = models.CharField('Category name',
+    name = models.CharField(verbose_name='Category name',
                             max_length=256, )
     slug = models.SlugField(unique=True,
                             max_length=50, )
@@ -34,7 +14,7 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    name = models.CharField('Genre name',
+    name = models.CharField(verbose_name='Genre name',
                             max_length=256, )
     slug = models.SlugField(unique=True,
                             max_length=50, )
@@ -52,40 +32,41 @@ class Title(models.Model):
                               verbose_name='Slug of genre', )
     name = models.CharField(max_length=256,
                             verbose_name='Name', )
-    year = models.DateField('Publication year', )
-    description = models.TextField('Description',
+    year = models.DateField(verbose_name='Publication year', )
+    description = models.TextField(verbose_name='Description',
                                    null=True,
                                    blank=True, )
-
-    # author = models.ForeignKey(
-    #     User, on_delete=models.CASCADE, related_name='reviews')
-
+    rating = 
+    
     class Meta:
         default_related_name = 'titles'
 
 
 class Review(models.Model):
     title = models.ForeignKey(Title,
-                              on_delete=models.CASCADE,
-                              related_name='reviews', )
-    text = models.TextField('Text of the review', )
+                              on_delete=models.CASCADE, )
+    text = models.TextField(verbose_name='Text of the review', )
     score = models.IntegerField(default=5,
                                 verbose_name='Rating score',
                                 validators=[MinValueValidator(1),
                                             MaxValueValidator(10)], )
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
-    # author = models.ForeignKey(
-    #     User, on_delete=models.CASCADE, related_name='reviews')
+    pub_date = models.DateTimeField(verbose_name='Дата публикации',
+                                    auto_now_add=True)
+    author = models.ForeignKey(User,
+                               on_delete=models.CASCADE, )
+
+    class Meta:
+        default_related_name = 'reviews'
 
 
 class Comment(models.Model):
     review = models.ForeignKey(Review,
-                               on_delete=models.CASCADE, related_name='comments',)
-    text = models.TextField()
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
-
-    # author = models.ForeignKey(
-    #     User, on_delete=models.CASCADE, related_name='comments')
+                               on_delete=models.CASCADE, )
+    text = models.TextField(verbose_name='Text to comment', )
+    pub_date = models.DateTimeField(verbose_name='Дата публикации',
+                                    auto_now_add=True, )
+    author = models.ForeignKey(User,
+                               on_delete=models.CASCADE, )
 
     class Meta:
         default_related_name = 'comments'
