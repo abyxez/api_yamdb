@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import User
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -11,24 +10,10 @@ class SignUpSerializer(serializers.ModelSerializer):
             'email'
         )
 
-    def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email']
+
+class GetTokenSerializer(serializers.Serializer):
+    class Meta:
+        fields = (
+            'username',
+            'confirmation_code'
         )
-        user.set_password('password')
-        user.save()
-        return user
-
-
-class TokenObtainPairWithoutPasswordSerializer(TokenObtainPairSerializer):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['password'].required = False
-
-    def validate(self, attrs):
-        attrs.update({'password': ''})
-        return super(
-            TokenObtainPairWithoutPasswordSerializer,
-            self).validate(attrs)
