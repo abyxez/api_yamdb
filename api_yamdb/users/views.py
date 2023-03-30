@@ -1,11 +1,13 @@
-from .serializers import SignUpSerializer
+import string
+from random import choices
+
+from django.core.mail import send_mail
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
-from django.core.mail import send_mail
-from random import choices
-import string
-from .models import UserConfirmation, User
+
+from .models import User, UserConfirmation
+from .serializers import SignUpSerializer
 
 
 @api_view(['POST'])
