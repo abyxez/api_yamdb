@@ -6,6 +6,8 @@ from .views import UserViewSet, get_jwt_token, signup, user_me
 router = SimpleRouter()
 router.register('', UserViewSet, basename='users')
 
+app_name = 'users'
+
 urlpatterns = [
     path('signup/', signup),
     path('token/', get_jwt_token),
