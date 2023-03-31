@@ -1,9 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-import datetime
-from datetime import timedelta
-import jwt
-from django.conf import settings
+from django.db import models
 
 
 class UserManager(BaseUserManager):
@@ -18,6 +14,17 @@ class UserManager(BaseUserManager):
 
         user = self.model(username=username, email=self.normalize_email(email))
         user.set_password(password)
+        user.save()
+
+        return user
+
+    def create_superuser(self, username, email, password):
+        if password is None:
+            raise TypeError('Superusers must have a password.')
+
+        user = self.create_user(username, email, password)
+        user.is_superuser = True
+        user.is_staff = True
         user.save()
 
         return user
@@ -44,27 +51,3 @@ class User(AbstractUser):
         unique=True
     )
     objects = UserManager()
-
-    def _generate_jwt_token(self):
-        dt = datetime.datetime.now() + timedelta(days=1)
-
-        token = jwt.encode({
-            'id': self.pk,
-            'exp': int(dt.strftime('%s'))
-        }, settings.SECRET_KEY, algorithm='HS256')
-
-        return token
-
-
-class UserConfirmation(models.Model):
-    confirmation_code = models.CharField(
-        max_length=6,
-        blank=False,
-        null=False
-    )
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        blank=False,
-        null=False
-    )
