@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from requests import Response
 from rest_framework import viewsets, permissions
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
