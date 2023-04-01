@@ -26,6 +26,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     filter_backends = (SearchFilter, )
     search_fields = ('name', )
+    lookup_field = 'slug'
     #permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
 
 
