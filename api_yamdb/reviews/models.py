@@ -1,6 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from users.models import User
+from datetime import datetime
 
 
 class Category(models.Model):
@@ -27,12 +28,13 @@ class Title(models.Model):
     category = models.ForeignKey(Category,
                                  on_delete=models.PROTECT,
                                  verbose_name='Slug of category', )
-    genre = models.ForeignKey(Genre,
-                              on_delete=models.PROTECT,
-                              verbose_name='Slug of genre', )
+    genre = models.ManyToManyField(Genre,
+                                   verbose_name='Slug of genre', )
     name = models.CharField(max_length=256,
                             verbose_name='Name', )
-    year = models.DateField(verbose_name='Publication year', )
+    year = models.IntegerField(verbose_name='Publication year',
+                               validators=[MinValueValidator(0),
+                                           MaxValueValidator(datetime.now().year)], )
     description = models.TextField(verbose_name='Description',
                                    null=True,
                                    blank=True, )
@@ -43,7 +45,7 @@ class Title(models.Model):
 
 class Review(models.Model):
     title = models.ForeignKey(Title,
-                              on_delete=models.CASCADE, )
+                              on_delete=models.CASCADE, related_name='reviews')
     text = models.TextField(verbose_name='Text of the review', )
     score = models.IntegerField(default=5,
                                 verbose_name='Rating score',

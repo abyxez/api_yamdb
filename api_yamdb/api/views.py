@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
+from requests import Response
+from rest_framework import viewsets, permissions
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -8,7 +9,7 @@ from reviews.models import Category, Comment, Genre, Review, Title
 from .permissions import IsAdminOrReadOnly
 
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer, TitleSerializer)
+                          GenreSerializer, ReviewSerializer, TitleListSerializer, TitleCreateSerializer)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -16,7 +17,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     filter_backends = (SearchFilter,)
     search_fields = ('name', )
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
+    lookup_field = 'slug'
+    #permission_classes = (IsAdminOrReadOnly, )
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -24,23 +26,28 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     filter_backends = (SearchFilter, )
     search_fields = ('name', )
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
+    #permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
+    serializer_class = TitleListSerializer
     filter_backends = (DjangoFilterBackend, )
     filterset_fields = ('category__slug',
                         'genre__slug',
                         'name',
                         'year', )
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
+    #permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
+
+    def get_serializer_class(self):
+        if self.action == 'list' or 'retrieve':
+            return TitleListSerializer
+        return TitleCreateSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    #permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -53,7 +60,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    #permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))

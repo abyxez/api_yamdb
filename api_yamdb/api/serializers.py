@@ -3,31 +3,62 @@ from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
+
     class Meta:
-        fields = ('name',
-                  'slug', )
+        fields = '__all__'
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('name',
-                  'slug', )
+                  'slug',)
         model = Genre
 
 
-class TitleSerializer(serializers.ModelSerializer):
+class TitleListSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(read_only=True)
+    rating = serializers.SerializerMethodField()
+
     class Meta:
-        fields = ('category',
-                  'genre',
+        fields = ('id',
                   'name',
                   'year',
-                  'description', )
+                  'rating',
+                  'description',
+                  'genre',
+                  'category',)
+        model = Title
+
+    def get_rating(self, obj):
+        reviews = obj.reviews.all()
+        rating_sum = 0
+        for review in reviews:
+            rating_sum += review.score
+        if reviews.count() != 0:
+            return int(round((rating_sum / reviews.count())))
+        return 0
+
+
+class TitleCreateSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        read_only=True,)
+    genre = serializers.SlugRelatedField(
+        slug_field='slug',
+        read_only=True,)
+
+    class Meta:
+        fields = ('name',
+                  'year',
+                  'description',
+                  'genre',
+                  'category',)
         model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True,
@@ -39,12 +70,11 @@ class ReviewSerializer(serializers.ModelSerializer):
                   'text',
                   'author'
                   'score',
-                  'pub_date', )
+                  'pub_date',)
         read_only_fields = ('title',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
-
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True,
@@ -55,6 +85,5 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('id',
                   'text',
                   'author'
-                  'pub_date', )
-        read_only_fields = ('review', )
-
+                  'pub_date',)
+        read_only_fields = ('review',)
