@@ -1,35 +1,35 @@
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import User
 
 
-class SignUpSerializer(serializers.ModelSerializer):
+class SignUpSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150, allow_blank=False)
+    email = serializers.EmailField()
+
     class Meta:
-        model = User
         fields = (
             'username',
             'email'
         )
 
-    def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email']
+
+class GetTokenSerializer(serializers.Serializer):
+    class Meta:
+        fields = (
+            'username',
+            'confirmation_code'
         )
-        user.set_password('password')
-        user.save()
-        return user
 
 
-class TokenObtainPairWithoutPasswordSerializer(TokenObtainPairSerializer):
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
+        read_only_fields = ('role',)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['password'].required = False
-
-    def validate(self, attrs):
-        attrs.update({'password': ''})
-        return super(
-            TokenObtainPairWithoutPasswordSerializer,
-            self).validate(attrs)
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Нельзя использовать это имя')
+        return value

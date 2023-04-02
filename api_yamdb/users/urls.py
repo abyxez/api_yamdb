@@ -1,13 +1,16 @@
-from django.urls import path
-from .views import signup
+from django.urls import include, path
+from rest_framework.routers import SimpleRouter
 
-# from rest_framework_simplejwt.views import (
-#     TokenObtainPairView,
-#     TokenRefreshView,
-# )
+from .views import UserViewSet, get_jwt_token, signup, user_me
+
+router = SimpleRouter()
+router.register('', UserViewSet, basename='users')
+
 app_name = 'users'
 
 urlpatterns = [
-    path('v1/auth/signup/', signup),
-    # path('v1/auth/token/', TokenObtainPairWithoutPasswordView.as_view())
+    path('signup/', signup),
+    path('token/', get_jwt_token),
+    path('me/', user_me),
+    path('', include(router.urls))
 ]
