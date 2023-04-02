@@ -4,7 +4,7 @@ from django.db import models
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, username, email, password=None):
+    def create_user(self, username, email, password=None, role=None, bio=None):
         """ Создает и возвращает пользователя с имэйлом, паролем и именем. """
         if username is None:
             raise TypeError('Users must have a username.')
@@ -18,7 +18,7 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, username, email, password):
+    def create_superuser(self, username, email, password, role=None, bio=None):
         if password is None:
             raise TypeError('Superusers must have a password.')
 

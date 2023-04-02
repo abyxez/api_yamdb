@@ -22,12 +22,24 @@ class GetTokenSerializer(serializers.Serializer):
         )
 
 
+class UserSerializerMe(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
+        read_only_fields = ('role', )
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Нельзя использовать это имя')
+        return value
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role')
-        read_only_fields = ('role',)
 
     def validate_username(self, value):
         if value == 'me':

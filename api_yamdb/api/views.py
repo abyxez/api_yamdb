@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
-from .permissions import IsAdminOrReadOnly, IsModeratorOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from reviews.models import Category, Comment, Genre, Review, Title
 
 
@@ -17,8 +18,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter,)
     search_fields = ('name', )
     lookup_field = 'slug'
-    permission_classes = (IsAdminOrReadOnly, )
-
+    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -27,7 +27,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, )
     search_fields = ('name', )
     lookup_field = 'slug'
-    permission_classes = (IsAdminOrReadOnly, )
+    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -38,7 +38,7 @@ class TitleViewSet(viewsets.ModelViewSet):
                         'genre__slug',
                         'name',
                         'year', )
-    permission_classes = (IsAdminOrReadOnly, )
+    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -48,8 +48,9 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (IsModeratorOrReadOnly, )
-
+    permission_classes = (IsAuthenticatedOrReadOnly,
+                          IsAuthorOrReadOnly,
+                          )
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -62,7 +63,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsModeratorOrReadOnly, )
+    permission_classes = (IsAuthenticatedOrReadOnly,
+                          IsAuthorOrReadOnly,
+                          )
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))

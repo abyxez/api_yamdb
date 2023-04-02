@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from .models import User
 from .permissions import IsAdminOnly
-from .serializers import GetTokenSerializer, SignUpSerializer, UserSerializer
+from .serializers import GetTokenSerializer, SignUpSerializer, UserSerializer, UserSerializerMe
 
 
 @api_view(['POST'])
@@ -51,6 +51,10 @@ def signup(request):
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )
+        return Response(
+                    serializer.errors,
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
 
 @api_view(['POST'])
@@ -78,39 +82,14 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdminOnly,)
-
-    def retrieve(self, request, pk=None):
-        user = get_object_or_404(User, username=pk)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-
-    def destroy(self, request, pk=None):
-        user = get_object_or_404(User, username=pk)
-        user.delete()
-        return Response(
-            {
-                f'Пользователь {pk} удален из базы данных.'
-            },
-            status=status.HTTP_204_NO_CONTENT
-        )
-
-    def partial_update(self, request, pk=None):
-        user = get_object_or_404(User, username=pk)
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {'Данные пользователя обновлены'},
-                status=status.HTTP_200_OK
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    lookup_field = 'username'
 
 
 @api_view(['GET', 'PATCH'])
 def user_me(request):
     if request.method == 'GET':
         if request.user.is_authenticated:
-            serializer = UserSerializer(request.user)
+            serializer = UserSerializerMe(request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(
             {'Анонимный пользователь'},
@@ -118,7 +97,7 @@ def user_me(request):
         )
     if request.method == 'PATCH':
         if request.user.is_authenticated:
-            serializer = UserSerializer(
+            serializer = UserSerializerMe(
                 request.user,
                 data=request.data,
                 partial=True
