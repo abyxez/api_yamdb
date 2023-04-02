@@ -8,7 +8,7 @@ from rest_framework.pagination import (LimitOffsetPagination,
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
-from .permissions import IsAdminOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsModeratorOrReadOnly, IsAuthorOrReadOnly
 
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, TitleSerializer)
@@ -20,7 +20,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter,)
     search_fields = ('name', )
     pagination_class = (LimitOffsetPagination, )
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
+    permission_classes = (IsAdminOrReadOnly, )
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -29,7 +29,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, )
     search_fields = ('name', )
     pagination_class = (LimitOffsetPagination, )
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
+    permission_classes = (IsAdminOrReadOnly, )
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -41,13 +41,13 @@ class TitleViewSet(viewsets.ModelViewSet):
                         'name',
                         'year', )
     pagination_class = (LimitOffsetPagination, )
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
+    permission_classes = (IsAdminOrReadOnly, )
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     pagination_class = (LimitOffsetPagination, )
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsAuthorOrReadOnly, IsModeratorOrReadOnly )
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -61,7 +61,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = (LimitOffsetPagination, )
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsAuthorOrReadOnly, IsModeratorOrReadOnly )
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
