@@ -5,31 +5,34 @@ from reviews.models import Category, Comment, Genre, Review, Title
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = '__all__'
         model = Category
+        fields = ('name',
+                  'slug',)
 
 
 class GenreSerializer(serializers.ModelSerializer):
+
     class Meta:
+        model = Genre
         fields = ('name',
                   'slug',)
-        model = Genre
 
 
 class TitleListSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
-    genre = GenreSerializer(read_only=True)
+    genre = GenreSerializer(read_only=True, many=True)
     rating = serializers.SerializerMethodField()
 
     class Meta:
+        model = Title
         fields = ('id',
                   'name',
                   'year',
                   'rating',
                   'description',
                   'genre',
-                  'category',)
-        model = Title
+                  'category',
+                  )
 
     def get_rating(self, obj):
         reviews = obj.reviews.all()
@@ -43,19 +46,20 @@ class TitleListSerializer(serializers.ModelSerializer):
 
 class TitleCreateSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
-        slug_field='slug',
-        read_only=True,)
+        queryset=Category.objects.all(),
+        slug_field='slug',)
     genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(),
         slug_field='slug',
-        read_only=True,)
+        many=True,)
 
     class Meta:
+        model = Title
         fields = ('name',
                   'year',
                   'description',
                   'genre',
                   'category',)
-        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -68,7 +72,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = ('id',
                   'text',
-                  'author'
+                  'author',
                   'score',
                   'pub_date',)
         read_only_fields = ('title',)
@@ -84,6 +88,6 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ('id',
                   'text',
-                  'author'
+                  'author',
                   'pub_date',)
         read_only_fields = ('review',)
