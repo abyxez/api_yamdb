@@ -1,4 +1,3 @@
-import re
 from rest_framework import serializers
 
 from .models import User
@@ -21,8 +20,6 @@ class SignUpSerializer(serializers.Serializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=150, allow_blank=False)
-    email = serializers.EmailField(max_length=254, allow_blank=False)
 
     class Meta:
         model = User
@@ -39,6 +36,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 class GetTokenSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150, allow_blank=False)
+    confirmation_code = serializers.CharField(
+        max_length=150,
+        allow_blank=False
+    )
 
     class Meta:
         fields = (
@@ -48,8 +49,6 @@ class GetTokenSerializer(serializers.Serializer):
 
 
 class UserSerializerMe(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=150, allow_blank=False)
-    email = serializers.EmailField(max_length=254)
 
     class Meta:
         model = User
@@ -58,9 +57,7 @@ class UserSerializerMe(serializers.ModelSerializer):
         read_only_fields = ('role', )
 
 
-class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=150, allow_blank=False)
-    email = serializers.EmailField(max_length=254, allow_blank=False)
+class UserSerializerAdmin(serializers.ModelSerializer):
 
     class Meta:
         model = User

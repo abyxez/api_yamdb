@@ -12,7 +12,7 @@ from .models import User
 from .permissions import IsAdminOnly
 from .serializers import (
     GetTokenSerializer, SignUpSerializer, UserCreateSerializer,
-    UserSerializer, UserSerializerMe
+    UserSerializerAdmin, UserSerializerMe
 )
 
 
@@ -105,7 +105,7 @@ def get_jwt_token(request):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserSerializerAdmin
     permission_classes = (IsAuthenticated, IsAdminOnly)
     filter_backends = (SearchFilter, )
     search_fields = ('username', )
