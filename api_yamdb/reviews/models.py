@@ -34,8 +34,6 @@ class Title(models.Model):
     category = models.ForeignKey(Category,
                                  on_delete=models.PROTECT,
                                  verbose_name='Категория', )
-    genre = models.ManyToManyField(Genre,
-                                   verbose_name='Жанр', )
     name = models.CharField(max_length=256,
                             verbose_name='Название', )
     year = models.IntegerField(verbose_name='Год публикации',
@@ -82,3 +80,14 @@ class Comment(models.Model):
 
     class Meta:
         default_related_name = 'comments'
+
+
+class GenreTitle(models.Model):
+    title = models.ForeignKey(Title,
+                              verbose_name='Произведения',
+                              related_name='titles',
+                              on_delete=models.CASCADE, )
+    genre = models.ForeignKey(Genre,
+                              verbose_name='Жанры',
+                              related_name='genres',
+                              on_delete=models.CASCADE, )
