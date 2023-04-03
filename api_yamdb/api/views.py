@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, mixins
+from django_filters import CharFilter
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from requests import Response
+from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
@@ -35,14 +37,20 @@ class GenreViewSet(mixins.CreateModelMixin,
     permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly,)
 
 
+class TitleFilter(FilterSet):
+    category = CharFilter(field_name='category__slug')
+    genre = CharFilter(field_name='genre__slug')
+
+    class Meta:
+        model = Title
+        fields = ['name', 'year', 'category', 'genre']
+
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleListSerializer
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category__slug',
-                        'genre__slug',
-                        'name',
-                        'year',)
+    filterset_class = TitleFilter
     permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly,)
 
     def get_serializer_class(self):

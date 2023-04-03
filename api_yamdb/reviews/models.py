@@ -34,6 +34,8 @@ class Title(models.Model):
     category = models.ForeignKey(Category,
                                  on_delete=models.PROTECT,
                                  verbose_name='Категория', )
+    genre = models.ManyToManyField(Genre,
+                                   through='GenreTitle')
     name = models.CharField(max_length=256,
                             verbose_name='Название', )
     year = models.IntegerField(verbose_name='Год публикации',
@@ -64,7 +66,7 @@ class Review(models.Model):
 
     class Meta:
         default_related_name = 'reviews'
-        unique_together = ('title', 'author')
+        #unique_together = ('title', 'author')
 
 
 class Comment(models.Model):
