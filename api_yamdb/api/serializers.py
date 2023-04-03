@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 from reviews.models import Category, Comment, Genre, Review, Title
 
 
@@ -76,6 +75,7 @@ class ReviewSerializer(serializers.ModelSerializer):
                   'score',
                   'pub_date',)
         read_only_fields = ('title',)
+
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(

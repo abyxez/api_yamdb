@@ -1,16 +1,19 @@
 from django.shortcuts import get_object_or_404
 from django_filters import CharFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
-from requests import Response
+from rest_framework.response import Response
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
-from reviews.models import Category, Comment, Genre, Review, Title
+from reviews.models import Category, Genre, Review, Title
 
-from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer, TitleListSerializer, TitleCreateSerializer)
+from .serializers import (
+    CategorySerializer, CommentSerializer,
+    GenreSerializer, ReviewSerializer,
+    TitleListSerializer, TitleCreateSerializer
+)
 
 
 class CategoryViewSet(mixins.CreateModelMixin,
@@ -72,6 +75,16 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
+
+    def create(self, request, title_id=None):
+        if Review.objects.filter(
+            title=self.kwargs.get('title_id'),
+            author=request.user
+        ).exists():
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().create(request, title_id)
 
 
 class CommentViewSet(viewsets.ModelViewSet):

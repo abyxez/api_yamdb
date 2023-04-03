@@ -1,7 +1,8 @@
+from datetime import datetime
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from users.models import User
-from datetime import datetime
 
 
 class Category(models.Model):
@@ -38,9 +39,13 @@ class Title(models.Model):
                                    through='GenreTitle')
     name = models.CharField(max_length=256,
                             verbose_name='Название', )
-    year = models.IntegerField(verbose_name='Год публикации',
-                               validators=[MinValueValidator(0),
-                                           MaxValueValidator(datetime.now().year)], )
+    year = models.IntegerField(
+        verbose_name='Год публикации',
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(datetime.now().year)
+        ]
+    )
     description = models.TextField(verbose_name='Описание',
                                    null=True,
                                    blank=True, )
@@ -66,7 +71,7 @@ class Review(models.Model):
 
     class Meta:
         default_related_name = 'reviews'
-        #unique_together = ('title', 'author')
+        unique_together = ('title', 'author', )
 
 
 class Comment(models.Model):
