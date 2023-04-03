@@ -1,44 +1,49 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from reviews.models import Category, Comment, Genre, Review, Title
 
-
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, TitleListSerializer, TitleCreateSerializer)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(mixins.CreateModelMixin,
+                      mixins.ListModelMixin,
+                      mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (SearchFilter,)
-    search_fields = ('name', )
+    search_fields = ('name',)
     lookup_field = 'slug'
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
+    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly,)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(mixins.CreateModelMixin,
+                   mixins.ListModelMixin,
+                   mixins.DestroyModelMixin,
+                   viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    filter_backends = (SearchFilter, )
-    search_fields = ('name', )
+    filter_backends = (SearchFilter,)
+    search_fields = ('name',)
     lookup_field = 'slug'
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
+    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly,)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleListSerializer
-    filter_backends = (DjangoFilterBackend, )
+    filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category__slug',
                         'genre__slug',
                         'name',
-                        'year', )
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, )
+                        'year',)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly,)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
