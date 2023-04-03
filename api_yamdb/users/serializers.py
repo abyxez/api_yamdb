@@ -1,3 +1,4 @@
+import re
 from rest_framework import serializers
 
 from .models import User
@@ -5,7 +6,7 @@ from .models import User
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150, allow_blank=False)
-    email = serializers.EmailField()
+    email = serializers.EmailField(max_length=254, allow_blank=False)
 
     class Meta:
         fields = (
@@ -13,8 +14,32 @@ class SignUpSerializer(serializers.Serializer):
             'email'
         )
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Имя me нельзя использовать')
+        return value
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=150, allow_blank=False)
+    email = serializers.EmailField(max_length=254, allow_blank=False)
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'email'
+        )
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Имя me нельзя использовать')
+        return value
+
 
 class GetTokenSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150, allow_blank=False)
+
     class Meta:
         fields = (
             'username',
@@ -23,25 +48,21 @@ class GetTokenSerializer(serializers.Serializer):
 
 
 class UserSerializerMe(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=150, allow_blank=False)
+    email = serializers.EmailField(max_length=254)
+
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role')
         read_only_fields = ('role', )
 
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError('Нельзя использовать это имя')
-        return value
-
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=150, allow_blank=False)
+    email = serializers.EmailField(max_length=254, allow_blank=False)
+
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role')
-
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError('Нельзя использовать это имя')
-        return value
