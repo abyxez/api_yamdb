@@ -5,24 +5,31 @@ from django.db import models
 class UserManager(BaseUserManager):
 
     def create_user(self, username, email, password=None, role=None, bio=None):
-        """ Создает и возвращает пользователя с имэйлом, паролем и именем. """
         if username is None:
             raise TypeError('Users must have a username.')
 
         if email is None:
             raise TypeError('Users must have an email address.')
 
-        user = self.model(username=username, email=self.normalize_email(email))
+        user = self.model(
+            username=username,
+            email=self.normalize_email(email),
+            role=role,
+            bio=bio
+        )
         user.set_password(password)
         user.save()
 
         return user
 
-    def create_superuser(self, username, email, password, role=None, bio=None):
+    def create_superuser(
+        self, username, email,
+        password, role=None, bio=None
+    ):
         if password is None:
             raise TypeError('Superusers must have a password.')
 
-        user = self.create_user(username, email, password)
+        user = self.create_user(username, email, password, role, bio)
         user.is_superuser = True
         user.is_staff = True
         user.save()
@@ -38,7 +45,7 @@ class User(AbstractUser):
     ]
     bio = models.TextField(
         'Биография',
-        blank=True,
+        blank=True
     )
     role = models.CharField(
         'Пользовательская роль',
@@ -47,7 +54,9 @@ class User(AbstractUser):
         default='user'
     )
     email = models.EmailField(
+        max_length=254,
         blank=False,
+        null=False,
         unique=True
     )
     objects = UserManager()
