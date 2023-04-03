@@ -1,9 +1,9 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Category
         fields = ('name',
@@ -11,7 +11,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Genre
         fields = ('name',
@@ -41,21 +40,22 @@ class TitleListSerializer(serializers.ModelSerializer):
             rating_sum += review.score
         if reviews.count() != 0:
             return int(round((rating_sum / reviews.count())))
-        return 0
+        return None
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
-        slug_field='slug',)
+        slug_field='slug', )
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(),
         slug_field='slug',
-        many=True,)
+        many=True, )
 
     class Meta:
         model = Title
-        fields = ('name',
+        fields = ('id',
+                  'name',
                   'year',
                   'description',
                   'genre',
@@ -76,7 +76,6 @@ class ReviewSerializer(serializers.ModelSerializer):
                   'score',
                   'pub_date',)
         read_only_fields = ('title',)
-
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
