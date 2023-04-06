@@ -35,10 +35,11 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class GetTokenSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150, allow_blank=False)
+    username = serializers.CharField(
+        max_length=150, allow_blank=False,
+    )
     confirmation_code = serializers.CharField(
-        max_length=150,
-        allow_blank=False
+        max_length=150, allow_blank=False
     )
 
     class Meta:

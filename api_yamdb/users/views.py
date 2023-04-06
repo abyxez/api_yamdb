@@ -43,7 +43,7 @@ def signup(request):
                     )
                     return Response(serializer.data, status=status.HTTP_200_OK)
                 return Response(
-                    {'Введенный email не принадлежит этому пользователю'},
+                    {'username': 'Пользователь с таким именем уже есть'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             serializer = UserCreateSerializer(data=request.data)
@@ -63,7 +63,7 @@ def signup(request):
                     )
                     return Response(serializer.data, status=status.HTTP_200_OK)
                 return Response(
-                    {'Пользователь с таким email уже существует'},
+                    {'email': 'Пользователь с таким email уже существует'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             return Response(
@@ -93,11 +93,11 @@ def get_jwt_token(request):
                     status=status.HTTP_200_OK
                 )
             return Response(
-                serializer.errors,
+                {'confirmation_code': 'Неверный confirmation_code'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         return Response(
-            {'Введен неверный confirmation_code'},
+            serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
 
