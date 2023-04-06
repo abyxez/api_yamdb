@@ -1,25 +1,36 @@
 from django.shortcuts import get_object_or_404
 from django_filters import CharFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
-from rest_framework.response import Response
-from rest_framework import viewsets, mixins, status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework import mixins, status, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
-from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 from reviews.models import Category, Genre, Review, Title
 
-from .serializers import (
-    CategorySerializer, CommentSerializer,
-    GenreSerializer, ReviewSerializer,
-    TitleListSerializer, TitleCreateSerializer
-)
+from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer,
+                          TitleCreateSerializer, TitleListSerializer)
 
 
-class CategoryViewSet(mixins.CreateModelMixin,
+def get_title_review_instance(self, *args, **kwargs):
+    if self.kwargs.get('title_id'):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return title
+    else:
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        return review
+
+
+class CreateListDeleteViewSet(mixins.CreateModelMixin,
                       mixins.ListModelMixin,
                       mixins.DestroyModelMixin,
                       viewsets.GenericViewSet):
+    pass 
+
+
+class CategoryViewSet(CreateListDeleteViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (SearchFilter,)
@@ -28,10 +39,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
     permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly,)
 
 
-class GenreViewSet(mixins.CreateModelMixin,
-                   mixins.ListModelMixin,
-                   mixins.DestroyModelMixin,
-                   viewsets.GenericViewSet):
+class GenreViewSet(CreateListDeleteViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (SearchFilter,)
@@ -46,7 +54,7 @@ class TitleFilter(FilterSet):
 
     class Meta:
         model = Title
-        fields = ['name', 'year', 'category', 'genre']
+        fields = ('name', 'year', 'category', 'genre')
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -69,11 +77,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
                           )
 
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        title = get_title_review_instance(self)
         return title.reviews.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        title = get_title_review_instance(self)
         serializer.save(author=self.request.user, title=title)
 
     def create(self, request, title_id=None):
@@ -94,9 +102,9 @@ class CommentViewSet(viewsets.ModelViewSet):
                           )
 
     def get_queryset(self):
-        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        review = get_title_review_instance(self)
         return review.comments.all()
 
     def perform_create(self, serializer):
-        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        review = get_title_review_instance(self)
         serializer.save(author=self.request.user, review=review)
