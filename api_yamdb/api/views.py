@@ -1,19 +1,17 @@
 from django.shortcuts import get_object_or_404
 from django_filters import CharFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
-from rest_framework.response import Response
-from rest_framework import viewsets, mixins, status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework import mixins, status, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
-from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 from reviews.models import Category, Genre, Review, Title
 
-from .serializers import (
-    CategorySerializer, CommentSerializer,
-    GenreSerializer, ReviewSerializer,
-    TitleListSerializer, TitleCreateSerializer
-)
+from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer,
+                          TitleCreateSerializer, TitleListSerializer)
 
 
 class CategoryViewSet(mixins.CreateModelMixin,
