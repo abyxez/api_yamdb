@@ -38,10 +38,13 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
     ROLE_CHOICES = [
-        ('user', 'user'),
-        ('moderator', 'moderator'),
-        ('admin', 'admin')
+        (USER, 'user'),
+        (MODERATOR, 'moderator'),
+        (ADMIN, 'admin')
     ]
     bio = models.TextField(
         'Биография',
@@ -51,7 +54,7 @@ class User(AbstractUser):
         'Пользовательская роль',
         max_length=20,
         choices=ROLE_CHOICES,
-        default='user'
+        default=USER
     )
     email = models.EmailField(
         max_length=254,
@@ -60,3 +63,11 @@ class User(AbstractUser):
         unique=True
     )
     objects = UserManager()
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN
