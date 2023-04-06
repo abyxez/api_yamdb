@@ -141,7 +141,7 @@ SIMPLE_JWT = {
 }
 # Internationalization
 
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 

@@ -14,20 +14,20 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           TitleCreateSerializer, TitleListSerializer)
 
 
-def get_title_review_instance(self, *args, **kwargs):
-    if self.kwargs.get('title_id'):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        return title
-    else:
+def get_title_review_instance(self):
+    if self.kwargs.get('review_id'):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         return review
+    else:
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return title
 
 
 class CreateListDeleteViewSet(mixins.CreateModelMixin,
-                      mixins.ListModelMixin,
-                      mixins.DestroyModelMixin,
-                      viewsets.GenericViewSet):
-    pass 
+                              mixins.ListModelMixin,
+                              mixins.DestroyModelMixin,
+                              viewsets.GenericViewSet):
+    pass
 
 
 class CategoryViewSet(CreateListDeleteViewSet):
@@ -86,8 +86,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def create(self, request, title_id=None):
         if Review.objects.filter(
-            title=self.kwargs.get('title_id'),
-            author=request.user
+                title=self.kwargs.get('title_id'),
+                author=request.user
         ).exists():
             return Response(
                 status=status.HTTP_400_BAD_REQUEST

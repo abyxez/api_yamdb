@@ -1,6 +1,6 @@
-from django.utils.timezone import tzinfo
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone
 from users.models import User
 
 
@@ -16,7 +16,6 @@ class Category(models.Model):
     class Meta:
         default_related_name = 'categories'
         verbose_name_plural = 'Категории'
-
 
 
 class Genre(models.Model):
@@ -45,12 +44,12 @@ class Title(models.Model):
         'Год публикации',
         validators=[
             MinValueValidator(0),
-            MaxValueValidator(tzinfo)
+            MaxValueValidator(timezone.now().year)
         ]
     )
     description = models.TextField('Описание',
                                    blank=True, )
-    
+
     def __str__(self) -> str:
         return self.name
 
@@ -59,42 +58,42 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
 
-
 class Review(models.Model):
     title = models.ForeignKey(Title,
                               on_delete=models.CASCADE,
-                              verbose_name='Произведение',)
+                              verbose_name='Произведение', )
     text = models.TextField('Отзыв', )
     score = models.PositiveSmallIntegerField('Рейтинг',
                                              default=5,
-                                             validators=[MinValueValidator(1),
-                                                         MaxValueValidator(10)])
+                                             validators=[
+                                                 MinValueValidator(1),
+                                                 MaxValueValidator(10)])
     pub_date = models.DateTimeField('Дата публикации',
                                     auto_now_add=True)
     author = models.ForeignKey(User,
                                on_delete=models.CASCADE,
-                               verbose_name='Автор',)
+                               verbose_name='Автор', )
 
     def __str__(self) -> str:
         return self.text
-    
+
     class Meta:
         default_related_name = 'reviews'
-        unique_together = ('title', 'author', )
+        unique_together = ('title', 'author',)
         verbose_name_plural = 'Отзывы'
 
 
 class Comment(models.Model):
     review = models.ForeignKey(Review,
                                on_delete=models.CASCADE,
-                               verbose_name='Отзыв',)
+                               verbose_name='Отзыв', )
     text = models.TextField(verbose_name='Комментарий', )
     pub_date = models.DateTimeField('Дата публикации',
                                     auto_now_add=True, )
     author = models.ForeignKey(User,
                                on_delete=models.CASCADE,
-                               verbose_name='Автор',)
-    
+                               verbose_name='Автор', )
+
     def __str__(self) -> str:
         return self.text
 
@@ -112,9 +111,9 @@ class GenreTitle(models.Model):
                               verbose_name='Жанр',
                               related_name='genres',
                               on_delete=models.CASCADE, )
-    
-    def __str__(self) -> str:
-        return self.title, self.genre
 
-    class Meta: 
+    def __str__(self) -> str:
+        return str(self.title)
+
+    class Meta:
         verbose_name_plural = 'Жанры произведения'
