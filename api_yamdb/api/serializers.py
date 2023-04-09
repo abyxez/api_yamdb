@@ -58,14 +58,14 @@ class TitleCreateSerializer(serializers.ModelSerializer):
                   'description',
                   'genre',
                   'category')
-    
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         category_object = Category.objects.get(slug=ret['category'])
         ret['genre'] = [
             {'name': genre_obj.name, 'slug': genre_obj.slug}
             for genre_obj in Genre.objects.filter(slug__in=ret['genre'])
-        ]        
+        ]
         ret['category'] = {
             'name': category_object.name,
             'slug': category_object.slug
