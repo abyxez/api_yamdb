@@ -60,13 +60,21 @@ class TitleFilter(FilterSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleListSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
     permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly,)
 
+    #def create(self, request):
+    #    serializer = TitleCreateSerializer(data=request.data)
+    #    if serializer.is_valid():
+    #        serializer.save()
+    #        serializer = TitleListSerializer(data=request.data)
+    #        if serializer.is_valid():
+    #            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def get_serializer_class(self):
-        if self.request.method == 'GET':
+        if self.action in ['list', 'retrieve']:
             return TitleListSerializer
         return TitleCreateSerializer
 
