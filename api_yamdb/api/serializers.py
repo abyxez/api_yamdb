@@ -60,6 +60,14 @@ class TitleCreateSerializer(serializers.ModelSerializer):
                   'genre',
                   'category')
 
+    def create(self, validated_data):
+        genre = validated_data.pop('genre', None)
+        if not genre:
+            raise serializers.ValidationError('genre - обязательное поле.')
+        title = Title.objects.create(**validated_data)
+        title.genre.set(genre)
+        return title
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         category_object = Category.objects.get(slug=ret['category'])
