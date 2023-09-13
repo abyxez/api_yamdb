@@ -1,7 +1,7 @@
 # API_YAMDB
 
 Авторы проекта:
-- Константин Питонов 
+- Константин Мельник 
 - [Максим](https://github.com/BoomBot987)
 - [Игорь Бобров](https://github.com/makaimura000)
 ***
