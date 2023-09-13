@@ -20,7 +20,7 @@
 
 Локальзый запуск проекта:
 ```
-git clone
+git clone https://github.com/abyxez/api_yamdb
 
 cd api_yamdb/
 ```
